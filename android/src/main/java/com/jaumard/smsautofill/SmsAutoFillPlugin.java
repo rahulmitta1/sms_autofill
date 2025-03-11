@@ -317,7 +317,7 @@ public class SmsAutoFillPlugin implements FlutterPlugin, ActivityAware, MethodCa
         unregisterReceiver();
     }
 
-    private static class SmsBroadcastReceiver extends BroadcastReceiver {
+    public static class SmsBroadcastReceiver extends BroadcastReceiver {
 
         final WeakReference<SmsAutoFillPlugin> plugin;
         final String smsCodeRegexPattern;
@@ -329,6 +329,11 @@ public class SmsAutoFillPlugin implements FlutterPlugin, ActivityAware, MethodCa
 
         @Override
         public void onReceive(Context context, Intent intent) {
+            String sender = intent.getPackage();
+            if (!"com.google.android.gms".equals(sender)) {
+                return;
+            }
+
             if (SmsRetriever.SMS_RETRIEVED_ACTION.equals(intent.getAction())) {
                 if (plugin.get() == null) {
                     return;
